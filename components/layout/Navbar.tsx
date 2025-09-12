@@ -1,6 +1,6 @@
 "use client";
 
-import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import {
   ArrowLeft,
   ArrowRight,
@@ -40,13 +40,15 @@ const Navbar = ({
     return (
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Trello className="h-6 w-6 sm:w-8 sm:h-8 text-blue-600" />
-            <span className="text-xl sm:text-2xl font-bold text-gray-900">
-              {" "}
-              Trello Clone
-            </span>
-          </div>
+          <Link href="/">
+            <div className="flex items-center space-x-2">
+              <Trello className="h-6 w-6 sm:w-8 sm:h-8 text-blue-600" />
+              <span className="text-xl sm:text-2xl font-bold text-gray-900">
+                {" "}
+                Trello Clone
+              </span>
+            </div>
+          </Link>
           <div className="flex items-center space-x-2 sm:space-x-4">
             <UserButton />
           </div>
@@ -143,17 +145,20 @@ const Navbar = ({
   return (
     <header
       className={cn(
-        "border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50",className
+        "border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50",
+        className
       )}
     >
       <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Trello className="h-6 w-6 sm:w-8 sm:h-8 text-blue-600" />
-          <span className="text-xl sm:text-2xl font-bold text-gray-900">
-            {" "}
-            Trello Clone
-          </span>
-        </div>
+        <Link href="/">
+          <div className="flex items-center space-x-2 cursor-pointer">
+            <Trello className="h-6 w-6 sm:w-8 sm:h-8 text-blue-600" />
+            <span className="text-xl sm:text-2xl font-bold text-gray-900">
+              {" "}
+              Trello Clone
+            </span>
+          </div>
+        </Link>
         <div className="flex items-center space-x-2 sm:space-x-4">
           <div>
             {isSignedIn ? (
@@ -163,27 +168,30 @@ const Navbar = ({
                   {user?.firstName ?? user?.emailAddresses[0].emailAddress}
                 </span>
                 <Link href="/dashboard">
-                  <Button size="sm" className="text-xs sm:text-sm">
+                  <Button size="sm" className="text-xs sm:text-sm cursor-pointer">
                     Go to Dashboard <ArrowRight />
                   </Button>
                 </Link>
               </div>
             ) : (
-              <div>
-                <SignInButton>
+              <div className="flex items-center space-x-2">
+                <Link href="/sign-in">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs sm:text-sm"
+                    className="text-xs sm:text-sm cursor-pointer"
                   >
                     Sign In
                   </Button>
-                </SignInButton>
-                <SignUpButton>
-                  <Button size="sm" className="text-xs sm:text-sm">
+                </Link>
+                <Link href="/sign-up">
+                  <Button
+                    size="sm"
+                    className="text-xs sm:text-sm cursor-pointer"
+                  >
                     Sign Up
                   </Button>
-                </SignUpButton>
+                </Link>
               </div>
             )}
           </div>

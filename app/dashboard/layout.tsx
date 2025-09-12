@@ -1,4 +1,4 @@
-import { PlanProvider } from "@/lib/contexts/PlanContext";
+import { PlanProvider } from "@/features/dashboard/contexts/PlanContext";
 import { auth } from "@clerk/nextjs/server";
 
 export default async function DashboardLayout({

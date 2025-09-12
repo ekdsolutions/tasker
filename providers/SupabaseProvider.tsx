@@ -38,7 +38,6 @@ export default function SupabaseProvider({
 
   return (
     <Context.Provider value={{ supabase, isLoaded }}>
-      {/* {!isLoaded ? <div> Loading...</div> : children} */}
       {children}
     </Context.Provider>
   );

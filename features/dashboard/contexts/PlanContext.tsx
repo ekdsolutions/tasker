@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext } from "react";
 
 interface PlanContextType {
   isFreeUser: boolean;
@@ -8,7 +8,7 @@ interface PlanContextType {
   hasEnterprisePlan: boolean;
 }
 
-const PlanContext = createContext<PlanContextType | undefined>(undefined);
+export const PlanContext = createContext<PlanContextType | undefined>(undefined);
 
 interface PlanProviderProps {
   children: React.ReactNode;
@@ -33,12 +33,3 @@ export function PlanProvider({
     </PlanContext.Provider>
   );
 }
-
-export const usePlan = () => {
-  const context = useContext(PlanContext);
-  if (context === undefined) {
-    throw new Error("usePlan needs to be inside the provider");
-  }
-
-  return context;
-};
