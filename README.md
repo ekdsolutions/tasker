@@ -44,7 +44,7 @@ A modern project management tool inspired by Trello, built with Next.js, Supabas
 ![Dashboard](https://i.ibb.co/d03BSbpJ/trello-clone-dashboard.png)
 - User dashboard with board overview and statistics
 
-![Filters](https://i.ibb.co/wFYcksCm/trello-clone-filters.png)
+![Filters](https://i.ibb.co/5gk56gKV/trello-clone-dropdown.png)
 - Filter Dropdown on Dashboard Page
 
 ![Board](https://i.ibb.co/sJK02cFR/trello-clone-edit-board.png)
