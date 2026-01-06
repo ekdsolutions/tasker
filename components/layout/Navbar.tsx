@@ -44,7 +44,7 @@ const Navbar = ({
             <div className="flex items-center space-x-2">
               <span className="text-xl sm:text-2xl font-bold text-gray-900">
                 {" "}
-                🧀 Kesllo
+                🧀 Tasker
               </span>
             </div>
           </Link>
@@ -153,7 +153,7 @@ const Navbar = ({
             <Kanban className="h-6 w-6 sm:w-8 sm:h-8 text-blue-600" />
             <span className="text-xl sm:text-2xl font-bold text-gray-900">
               {" "}
-              🧀 Kesllo
+              🧀 Tasker
             </span>
           </div>
         </Link>

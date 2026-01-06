@@ -20,7 +20,7 @@ export default function Hero() {
               </Badge>
               <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
                 Organize your work with{" "}
-                <span className="text-blue-600">🧀 Kesllo</span>
+                <span className="text-blue-600">🧀 Tasker</span>
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed">
                 The visual way to manage any project, workflow, or team. Move

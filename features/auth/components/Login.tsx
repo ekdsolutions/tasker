@@ -8,7 +8,7 @@ export default function Login() {
       <AuthForm
         mode="sign-in"
         title="Sign in to your account"
-        subtitle="Welcome back to Kesllo 🧀"
+        subtitle="Welcome back to Tasker 🧀"
         redirectUrl="/dashboard"
         alternateUrl="/sign-up"
       />

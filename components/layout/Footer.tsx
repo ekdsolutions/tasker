@@ -10,7 +10,7 @@ export default function Footer() {
               <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
                 <span className="text-white font-bold">T</span>
               </div>
-              <span className="text-xl font-bold">Kesllo</span>
+              <span className="text-xl font-bold">Tasker</span>
             </div>
             <p className="text-gray-400">
               The visual way to manage any project, workflow, or team.
