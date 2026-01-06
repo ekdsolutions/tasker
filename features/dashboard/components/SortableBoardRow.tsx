@@ -6,7 +6,7 @@ import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { GripVertical, MoreVertical, Receipt, Recycle, MessageCircleQuestion, CircleCheck, NotepadText } from "lucide-react";
+import { GripVertical, MoreVertical, Receipt, Recycle, Hammer, CircleCheck, NotepadText } from "lucide-react";
 import { LabelEditor } from "./LabelEditor";
 import {
   DropdownMenu,
@@ -130,24 +130,26 @@ export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpda
     const received = board.received_value || 0;
     const total = board.total_value || 0;
 
-    // Rule 1: If upcoming has value (not 0), show Receipt (red)
+    // Rule 1: If upcoming has value (not 0), show Receipt (red-700)
     if (upcoming > 0) {
-      return { icon: Receipt, bgColor: "bg-red-500", color: "text-white" };
+      return { icon: Receipt, bgColor: "bg-red-700", color: "text-white" };
+    }
+
+    // Rule 3a: If upcoming and received are empty but total has any value, show Hammer (orange)
+    // This rule overrides the recycle rule
+    if (upcoming === 0 && received === 0 && total > 0) {
+      return { icon: Hammer, bgColor: "bg-orange-500", color: "text-white" };
+    }
+
+    // Rule 3b: If upcoming and annual are empty and received != total, show Hammer (orange)
+    // This rule overrides the recycle rule
+    if (upcoming === 0 && annual === 0 && received !== total) {
+      return { icon: Hammer, bgColor: "bg-orange-500", color: "text-white" };
     }
 
     // Rule 2: If upcoming is empty but annual has value, show Recycle (blue)
     if (upcoming === 0 && annual > 0) {
       return { icon: Recycle, bgColor: "bg-blue-500", color: "text-white" };
-    }
-
-    // Rule 3a: If upcoming and received are empty but total has any value, show MessageCircleQuestion (orange)
-    if (upcoming === 0 && received === 0 && total > 0) {
-      return { icon: MessageCircleQuestion, bgColor: "bg-orange-500", color: "text-white" };
-    }
-
-    // Rule 3b: If upcoming and annual are empty and received != total, show MessageCircleQuestion (orange)
-    if (upcoming === 0 && annual === 0 && received !== total) {
-      return { icon: MessageCircleQuestion, bgColor: "bg-orange-500", color: "text-white" };
     }
 
     // Rule 4: If upcoming and annual are empty but received equals total, show CircleCheck (green)
@@ -453,7 +455,7 @@ export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpda
             </TooltipTrigger>
             <TooltipContent>
               <p className="max-w-xs break-words">
-                {hasNotes ? board.notes : "nothing here..."}
+                {hasNotes ? board.notes : "Nothing here yet..."}
               </p>
             </TooltipContent>
           </Tooltip>
