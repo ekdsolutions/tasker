@@ -6,7 +6,7 @@ import {
   ArrowRight,
   Filter,
   MoreHorizontal,
-  Trello,
+  Kanban,
 } from "lucide-react";
 import React from "react";
 import { Button } from "../ui/button";
@@ -71,7 +71,7 @@ const Navbar = ({
               </Link>
               <div className="h-4 sm:h-6 w-px bg-gray-300 hidden sm:block" />
               <div className="hidden sm:flex items-center space-x-1 sm:space-x-2 min-w-0">
-                <Trello className="text-blue-600" />
+                <Kanban className="text-blue-600" />
                 <div className="items-center space-x-1 sm:space-x-2 min-w-0">
                   <span className="text-lg font-bold text-gray-900 truncate">
                     {boardTitle}
@@ -118,7 +118,7 @@ const Navbar = ({
             </div>
           </div>
           <div className="flex sm:hidden mt-4 justify-center items-center space-x-1 sm:space-x-2 min-w-0">
-            <Trello className="text-blue-600" />
+            <Kanban className="text-blue-600" />
             <div className="items-center space-x-1 sm:space-x-2 min-w-0">
               <span className="text-lg font-bold text-gray-900 truncate">
                 {boardTitle}
@@ -150,7 +150,7 @@ const Navbar = ({
       <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
         <Link href="/">
           <div className="flex items-center space-x-2 cursor-pointer">
-            <Trello className="h-6 w-6 sm:w-8 sm:h-8 text-blue-600" />
+            <Kanban className="h-6 w-6 sm:w-8 sm:h-8 text-blue-600" />
             <span className="text-xl sm:text-2xl font-bold text-gray-900">
               {" "}
               🧀 Kesllo

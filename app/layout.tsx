@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Kesllo",
-  description: "A modern project management tool inspired by Trello",
+  description: "A modern project management tool for organizing your tasks and projects",
 };
 
 export default function RootLayout({

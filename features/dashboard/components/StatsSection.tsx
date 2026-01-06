@@ -3,7 +3,7 @@
 import { StatsSkeleton } from "@/components/skeletons/Stats";
 import { Card, CardContent } from "@/components/ui/card";
 import { Board } from "@/lib/supabase/models";
-import { ChartLine, Rocket, Trello } from "lucide-react";
+import { ChartLine, Rocket, Kanban } from "lucide-react";
 
 interface StatsSectionProps {
   boards: Board[];
@@ -36,7 +36,7 @@ export function StatsSection({ boards, loading }: StatsSectionProps) {
               </p>
             </div>
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Trello className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              <Kanban className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
             </div>
           </div>
         </CardContent>
@@ -88,7 +88,7 @@ export function StatsSection({ boards, loading }: StatsSectionProps) {
               </p>
             </div>
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Trello className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              <Kanban className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
             </div>
           </div>
         </CardContent>
