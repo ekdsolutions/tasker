@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Board } from "@/lib/supabase/models";
+import { Board, Label } from "@/lib/supabase/models";
 import { Filter, Grid3X3, List, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import {
@@ -43,9 +43,9 @@ interface BoardsSectionProps {
   searchValue: string;
   onReorderBoards?: (newOrder: { id: string; sort_order: number }[]) => void;
   onBoardValueUpdate?: (boardId: string, updates: { total_value?: number; upcoming_value?: number; received_value?: number; annual?: number; started_date?: string | null }) => void;
-  allLabels?: Array<{ id: string; text: string; color: string }>;
+  allLabels?: Label[];
   onLabelsUpdate?: (boardId: string, labelIds: string[]) => Promise<void>;
-  onCreateLabel?: (text: string, color: string) => Promise<{ id: string; text: string; color: string }>;
+  onCreateLabel?: (text: string, color: string) => Promise<Label>;
 }
 
 export function BoardsSection({

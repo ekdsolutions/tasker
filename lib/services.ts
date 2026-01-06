@@ -51,6 +51,7 @@ export const boardService = {
 
       const labels = board.board_labels?.map(bl => bl.label).filter(Boolean) || [];
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { columns, board_labels, ...boardWithoutColumns } = board;
       return {
         ...boardWithoutColumns,
