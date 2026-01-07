@@ -65,6 +65,7 @@ export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpda
   const [isEditingReceived, setIsEditingReceived] = useState(false);
   const [isEditingStarted, setIsEditingStarted] = useState(false);
   const [isEditingLabel, setIsEditingLabel] = useState(false);
+  const [isEditingProducts, setIsEditingProducts] = useState(false);
   const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
   const [notesValue, setNotesValue] = useState<string>(board.notes || "");
 
