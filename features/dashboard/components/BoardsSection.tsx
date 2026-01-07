@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Board, Label } from "@/lib/supabase/models";
+import { Board, Label, SavedProduct } from "@/lib/supabase/models";
 import { Filter, Grid3X3, List, Plus } from "lucide-react";
 import Link from "next/link";
 import {
@@ -45,6 +45,9 @@ interface BoardsSectionProps {
   onLabelsUpdate?: (boardId: string, labelIds: string[]) => Promise<void>;
   onCreateLabel?: (text: string, color: string) => Promise<Label>;
   onDeleteLabel?: (labelId: string) => Promise<void>;
+  savedProducts?: SavedProduct[];
+  onProductsUpdate?: (boardId: string, products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number }>) => Promise<void>;
+  onCreateSavedProduct?: (name: string) => Promise<SavedProduct>;
   onEditBoard?: (boardId: string) => void;
   onDeleteBoard?: (boardId: string) => void;
 }
@@ -64,6 +67,9 @@ export function BoardsSection({
   onLabelsUpdate,
   onCreateLabel,
   onDeleteLabel,
+  savedProducts = [],
+  onProductsUpdate,
+  onCreateSavedProduct,
   onEditBoard,
   onDeleteBoard,
 }: BoardsSectionProps) {
@@ -266,7 +272,10 @@ export function BoardsSection({
                      Label
                    </th>
                    <th className="text-left py-2 px-3 text-sm font-semibold text-gray-700 hidden lg:table-cell">
-                     Upcoming
+                     Products
+                   </th>
+                   <th className="text-left py-2 px-3 text-sm font-semibold text-gray-700 hidden lg:table-cell">
+                     Pending
                    </th>
                    <th className="text-left py-2 px-3 text-sm font-semibold text-gray-700 hidden lg:table-cell">
                      Received
@@ -276,6 +285,9 @@ export function BoardsSection({
                    </th>
                    <th className="text-left py-2 px-3 text-sm font-semibold text-gray-700 hidden lg:table-cell">
                      Annual
+                   </th>
+                   <th className="text-left py-2 px-3 text-sm font-semibold text-gray-700 hidden lg:table-cell">
+                     Ending
                    </th>
                    <th className="text-left py-2 px-3 text-sm font-semibold text-gray-700 hidden lg:table-cell">
                      Started
@@ -307,6 +319,11 @@ export function BoardsSection({
                         throw new Error("createLabel function not provided");
                       })}
                       onDeleteLabel={onDeleteLabel}
+                      savedProducts={savedProducts}
+                      onProductsUpdate={onProductsUpdate || (async () => {})}
+                      onCreateSavedProduct={onCreateSavedProduct || (async () => {
+                        throw new Error("createSavedProduct function not provided");
+                      })}
                       onEditBoard={onEditBoard}
                       onDeleteBoard={onDeleteBoard}
                     />

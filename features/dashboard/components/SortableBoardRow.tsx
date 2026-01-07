@@ -1,6 +1,6 @@
 "use client";
 
-import { Board, Label } from "@/lib/supabase/models";
+import { Board, Label, SavedProduct } from "@/lib/supabase/models";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { GripVertical, MoreVertical, Receipt, Recycle, Hammer, CircleCheck, NotepadText } from "lucide-react";
 import { LabelEditor } from "./LabelEditor";
+import { ProductsEditor } from "./ProductsEditor";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,11 +39,14 @@ interface SortableBoardRowProps {
   onLabelsUpdate: (boardId: string, labelIds: string[]) => Promise<void>;
   onCreateLabel: (text: string, color: string) => Promise<Label>;
   onDeleteLabel?: (labelId: string) => Promise<void>;
+  savedProducts?: SavedProduct[];
+  onProductsUpdate?: (boardId: string, products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number }>) => Promise<void>;
+  onCreateSavedProduct?: (name: string) => Promise<SavedProduct>;
   onEditBoard?: (boardId: string) => void;
   onDeleteBoard?: (boardId: string) => void;
 }
 
-export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpdate, onCreateLabel, onDeleteLabel, onEditBoard, onDeleteBoard }: SortableBoardRowProps) {
+export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpdate, onCreateLabel, onDeleteLabel, savedProducts = [], onProductsUpdate, onCreateSavedProduct, onEditBoard, onDeleteBoard }: SortableBoardRowProps) {
   const {
     attributes,
     listeners,
@@ -55,12 +59,10 @@ export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpda
   const [totalValue, setTotalValue] = useState<string>(board.total_value?.toString() || "0");
   const [upcomingValue, setUpcomingValue] = useState<string>(board.upcoming_value?.toString() || "0");
   const [receivedValue, setReceivedValue] = useState<string>(board.received_value?.toString() || "0");
-  const [annualValue, setAnnualValue] = useState<string>(board.annual?.toString() || "0");
   const [startedDate, setStartedDate] = useState<string>(board.started_date ? new Date(board.started_date).toISOString().split('T')[0] : "");
   const [isEditingTotal, setIsEditingTotal] = useState(false);
   const [isEditingUpcoming, setIsEditingUpcoming] = useState(false);
   const [isEditingReceived, setIsEditingReceived] = useState(false);
-  const [isEditingAnnual, setIsEditingAnnual] = useState(false);
   const [isEditingStarted, setIsEditingStarted] = useState(false);
   const [isEditingLabel, setIsEditingLabel] = useState(false);
   const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
@@ -85,11 +87,6 @@ export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpda
     }
   }, [board.received_value, isEditingReceived]);
 
-  useEffect(() => {
-    if (!isEditingAnnual) {
-      setAnnualValue(board.annual?.toString() || "0");
-    }
-  }, [board.annual, isEditingAnnual]);
 
   useEffect(() => {
     if (!isEditingStarted) {
@@ -129,6 +126,19 @@ export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpda
     const annual = board.annual || 0;
     const received = board.received_value || 0;
     const total = board.total_value || 0;
+    const endingDate = board.ending_date;
+
+    // Check if ending date is within 3 months
+    let endingWithin3Months = false;
+    if (endingDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const ending = new Date(endingDate);
+      ending.setHours(0, 0, 0, 0);
+      const threeMonthsFromNow = new Date(today);
+      threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
+      endingWithin3Months = ending <= threeMonthsFromNow && ending >= today;
+    }
 
     // Rule 1: If upcoming has value (not 0), show Receipt (red-700)
     if (upcoming > 0) {
@@ -147,9 +157,14 @@ export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpda
       return { icon: Hammer, bgColor: "bg-orange-500", color: "text-white" };
     }
 
-    // Rule 2: If upcoming is empty but annual has value, show Recycle (blue)
+    // Rule 2: If upcoming is empty but annual has value, show Recycle
+    // If ending date is within 3 months, use red-700 background, otherwise blue
     if (upcoming === 0 && annual > 0) {
-      return { icon: Recycle, bgColor: "bg-blue-500", color: "text-white" };
+      return { 
+        icon: Recycle, 
+        bgColor: endingWithin3Months ? "bg-red-700" : "bg-blue-500", 
+        color: "text-white" 
+      };
     }
 
     // Rule 4: If upcoming and annual are empty but received equals total, show CircleCheck (green)
@@ -209,16 +224,6 @@ export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpda
     }
   };
 
-  const handleAnnualBlur = () => {
-    setIsEditingAnnual(false);
-    const numValue = parseFloat(annualValue) || 0;
-    if (numValue !== board.annual) {
-      onValueUpdate(board.id, { annual: numValue });
-    } else {
-      setAnnualValue(board.annual?.toString() || "0");
-    }
-  };
-
   const handleStartedDateBlur = () => {
     setIsEditingStarted(false);
     const dateValue = startedDate || null;
@@ -235,15 +240,6 @@ export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpda
     } else if (e.key === "Escape") {
       setReceivedValue(board.received_value?.toString() || "0");
       setIsEditingReceived(false);
-    }
-  };
-
-  const handleAnnualKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleAnnualBlur();
-    } else if (e.key === "Escape") {
-      setAnnualValue(board.annual?.toString() || "0");
-      setIsEditingAnnual(false);
     }
   };
 
@@ -264,6 +260,13 @@ export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpda
   const handleNotesSave = () => {
     onValueUpdate(board.id, { notes: notesValue.trim() || null });
     setIsNotesModalOpen(false);
+  };
+
+  const handleProductsSave = async (products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number }>) => {
+    if (onProductsUpdate) {
+      await onProductsUpdate(board.id, products);
+    }
+    setIsEditingProducts(false);
   };
 
   const handleNotesCancel = () => {
@@ -340,6 +343,28 @@ export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpda
           </div>
         )}
       </td>
+      <td className="py-2 px-3 text-sm text-gray-600 hidden lg:table-cell relative">
+        {isEditingProducts ? (
+          <ProductsEditor
+            products={board.products || []}
+            savedProducts={savedProducts}
+            onSave={handleProductsSave}
+            onCancel={() => setIsEditingProducts(false)}
+            onCreateSavedProduct={onCreateSavedProduct || (async () => {
+              throw new Error("createSavedProduct function not provided");
+            })}
+          />
+        ) : (
+          <div
+            onClick={() => setIsEditingProducts(true)}
+            className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded min-w-[80px] inline-block"
+          >
+            {board.products && board.products.length > 0
+              ? `${board.products.length} ${board.products.length === 1 ? "Product" : "Products"}`
+              : "-"}
+          </div>
+        )}
+      </td>
       <td className="py-2 px-3 text-sm text-gray-600 hidden lg:table-cell">
         {isEditingUpcoming ? (
           <Input
@@ -401,22 +426,28 @@ export function SortableBoardRow({ board, allLabels, onValueUpdate, onLabelsUpda
         )}
       </td>
       <td className="py-2 px-3 text-sm text-gray-600 hidden lg:table-cell">
-        {isEditingAnnual ? (
+        {formatCurrency(board.annual)}
+      </td>
+      <td className="py-2 px-3 text-sm text-gray-600 hidden lg:table-cell">
+        {formatDate(board.ending_date)}
+      </td>
+      <td className="py-2 px-3 text-sm text-gray-600 hidden lg:table-cell">
+        {isEditingStarted ? (
           <Input
-            type="number"
-            value={annualValue}
-            onChange={(e) => setAnnualValue(e.target.value)}
-            onBlur={handleAnnualBlur}
-            onKeyDown={handleAnnualKeyDown}
-            className="w-24 h-8"
+            type="date"
+            value={startedDate}
+            onChange={(e) => setStartedDate(e.target.value)}
+            onBlur={handleStartedDateBlur}
+            onKeyDown={handleStartedDateKeyDown}
+            className="w-32 h-8"
             autoFocus
           />
         ) : (
           <div
-            onClick={() => setIsEditingAnnual(true)}
+            onClick={() => setIsEditingStarted(true)}
             className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded min-w-[80px] inline-block"
           >
-            {formatCurrency(board.annual)}
+            {formatDate(board.started_date)}
           </div>
         )}
       </td>

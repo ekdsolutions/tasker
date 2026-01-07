@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 const VIEW_MODE_STORAGE_KEY = "tasker-view-mode";
 
 export default function Dashboard() {
-  const { createBoard, boards, labels, loading, error, refetch, reorderBoards, updateBoardValue, updateBoardLabels, createLabel, deleteBoard, deleteLabel } = useBoards();
+  const { createBoard, boards, labels, savedProducts, loading, error, refetch, reorderBoards, updateBoardValue, updateBoardLabels, updateBoardProducts, createLabel, createSavedProduct, deleteBoard, deleteLabel } = useBoards();
   const { isFreeUser } = usePlan();
   const { supabase } = useSupabase();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");

@@ -6,6 +6,25 @@ export interface Label {
   created_at: string;
 }
 
+export interface SavedProduct {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+}
+
+export interface Product {
+  id: string;
+  board_id: string;
+  name: string;
+  started_date: string;
+  period: 0.5 | 1 | 2 | 3;
+  price: number;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Board {
   id: string;
   title: string;
@@ -19,8 +38,10 @@ export interface Board {
   annual: number;
   started_date: string | null;
   notes: string | null;
+  ending_date: string | null;
   sort_order: number;
   labels?: Label[];
+  products?: Product[];
   totalTasks?: number;
 }
 

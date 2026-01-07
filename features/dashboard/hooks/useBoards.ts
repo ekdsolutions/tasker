@@ -1,7 +1,7 @@
 "use client";
 
-import { boardDataService, boardService, labelService, boardLabelService } from "@/lib/services";
-import { Board, Label } from "@/lib/supabase/models";
+import { boardDataService, boardService, labelService, boardLabelService, productService } from "@/lib/services";
+import { Board, Label, SavedProduct } from "@/lib/supabase/models";
 import { useSupabase } from "@/providers/SupabaseProvider";
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
@@ -11,6 +11,7 @@ export function useBoards() {
   const { supabase, isLoaded } = useSupabase();
   const [boards, setBoards] = useState<Board[]>([]);
   const [labels, setLabels] = useState<Label[]>([]);
+  const [savedProducts, setSavedProducts] = useState<SavedProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,6 +19,7 @@ export function useBoards() {
     if (user && isLoaded && supabase) {
       loadBoards();
       loadLabels();
+      loadSavedProducts();
     }
   }, [user, isLoaded]);
 
@@ -92,6 +94,16 @@ export function useBoards() {
     }
   }
 
+  async function loadSavedProducts() {
+    if (!user || !supabase) return;
+    try {
+      const data = await productService.getSavedProducts(supabase, user.id);
+      setSavedProducts(data);
+    } catch (err) {
+      console.error("Failed to load saved products:", err);
+    }
+  }
+
   async function updateBoardValue(
     boardId: string,
     updates: { total_value?: number; upcoming_value?: number; received_value?: number; annual?: number; started_date?: string | null; notes?: string | null }
@@ -140,9 +152,34 @@ export function useBoards() {
     }
   }
 
+  async function updateBoardProducts(boardId: string, products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number }>) {
+    if (!user || !supabase) return;
+    try {
+      await productService.updateBoardProducts(supabase, boardId, user.id, products);
+      await loadBoards(); // Reload to get updated products and calculated annual/ending
+      await loadSavedProducts(); // Reload saved products in case new ones were created
+    } catch (err) {
+      console.error("Failed to update board products:", err);
+      setError(err instanceof Error ? err.message : "Failed to update board products.");
+    }
+  }
+
+  async function createSavedProduct(name: string): Promise<SavedProduct> {
+    if (!user || !supabase) throw new Error("User not authenticated");
+    try {
+      const newProduct = await productService.createSavedProduct(supabase, user.id, name);
+      setSavedProducts((prev) => [...prev, newProduct]);
+      return newProduct;
+    } catch (err) {
+      console.error("Failed to create saved product:", err);
+      throw err;
+    }
+  }
+
   const refetch = () => {
     loadBoards();
     loadLabels();
+    loadSavedProducts();
   };
 
   async function deleteBoard(boardId: string) {
@@ -177,6 +214,7 @@ export function useBoards() {
   return { 
     boards, 
     labels,
+    savedProducts,
     loading, 
     error, 
     createBoard, 
@@ -184,7 +222,9 @@ export function useBoards() {
     reorderBoards, 
     updateBoardValue,
     updateBoardLabels,
+    updateBoardProducts,
     createLabel,
+    createSavedProduct,
     deleteBoard,
     deleteLabel,
   };
