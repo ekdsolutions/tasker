@@ -53,6 +53,7 @@ export function ProductsEditor({
     }];
   });
 
+  const [showNewProductInput, setShowNewProductInput] = useState<{ [key: number]: boolean }>({});
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -113,8 +114,8 @@ export function ProductsEditor({
         <div>
           <h3 className="text-sm font-semibold text-gray-700 mb-3">Products</h3>
           {productForms.map((form, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-3 mb-3 space-y-3">
-              <div className="flex items-center justify-between mb-2">
+            <div key={index} className="border border-gray-200 rounded-lg p-3 mb-3">
+              <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-medium text-gray-600">Product {index + 1}</span>
                 {productForms.length > 1 && (
                   <button
@@ -127,76 +128,123 @@ export function ProductsEditor({
                 )}
               </div>
 
-              {/* Product Name */}
-              <div className="space-y-1">
-                <Label className="text-xs">Product</Label>
-                <div className="relative">
-                  <Input
-                    type="text"
-                    value={form.name}
-                    onChange={(e) => handleProductChange(index, "name", e.target.value)}
-                    placeholder="Product name..."
-                    list={`product-suggestions-${index}`}
-                    onBlur={async () => {
-                      if (form.name.trim() && !savedProducts.find(sp => sp.name === form.name.trim())) {
-                        try {
-                          await onCreateSavedProduct(form.name.trim());
-                        } catch (error) {
-                          console.error("Error creating saved product:", error);
+              {/* 2x2 Grid Layout */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Product Name - Top Left */}
+                <div className="space-y-1">
+                  <Label className="text-xs">Product</Label>
+                  {savedProducts.length > 0 && !showNewProductInput[index] ? (
+                    <Select
+                      value={form.name || undefined}
+                      onValueChange={(value) => {
+                        if (value === "__new__") {
+                          // User wants to create a new product
+                          setShowNewProductInput({ ...showNewProductInput, [index]: true });
+                          handleProductChange(index, "name", "");
+                        } else {
+                          // User selected an existing saved product
+                          handleProductChange(index, "name", value);
                         }
-                      }
-                    }}
-                  />
-                  {savedProducts.length > 0 && (
-                    <datalist id={`product-suggestions-${index}`}>
-                      {savedProducts.map((sp) => (
-                        <option key={sp.id} value={sp.name} />
-                      ))}
-                    </datalist>
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select product..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {savedProducts.map((sp) => (
+                          <SelectItem key={sp.id} value={sp.name}>
+                            {sp.name}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="__new__">
+                          + Create new product
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        value={form.name}
+                        onChange={(e) => handleProductChange(index, "name", e.target.value)}
+                        placeholder="Product name..."
+                        className="flex-1"
+                        onBlur={async () => {
+                          if (form.name.trim() && !savedProducts.find(sp => sp.name === form.name.trim())) {
+                            try {
+                              await onCreateSavedProduct(form.name.trim());
+                              setShowNewProductInput({ ...showNewProductInput, [index]: false });
+                            } catch (error) {
+                              console.error("Error creating saved product:", error);
+                            }
+                          } else if (form.name.trim()) {
+                            setShowNewProductInput({ ...showNewProductInput, [index]: false });
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Escape") {
+                            setShowNewProductInput({ ...showNewProductInput, [index]: false });
+                          }
+                        }}
+                      />
+                      {savedProducts.length > 0 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setShowNewProductInput({ ...showNewProductInput, [index]: false });
+                            handleProductChange(index, "name", "");
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </div>
-              </div>
 
-              {/* Started Date */}
-              <div className="space-y-1">
-                <Label className="text-xs">Started</Label>
-                <Input
-                  type="date"
-                  value={form.started_date}
-                  onChange={(e) => handleProductChange(index, "started_date", e.target.value)}
-                />
-              </div>
+                {/* Started Date - Top Right */}
+                <div className="space-y-1">
+                  <Label className="text-xs">Started</Label>
+                  <Input
+                    type="date"
+                    value={form.started_date}
+                    onChange={(e) => handleProductChange(index, "started_date", e.target.value)}
+                  />
+                </div>
 
-              {/* Period */}
-              <div className="space-y-1">
-                <Label className="text-xs">Period</Label>
-                <Select
-                  value={form.period.toString()}
-                  onValueChange={(value) => handleProductChange(index, "period", parseFloat(value) as 0.5 | 1 | 2 | 3)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0.5">0.5 year</SelectItem>
-                    <SelectItem value="1">1 year</SelectItem>
-                    <SelectItem value="2">2 years</SelectItem>
-                    <SelectItem value="3">3 years</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                {/* Period - Bottom Left */}
+                <div className="space-y-1">
+                  <Label className="text-xs">Period</Label>
+                  <Select
+                    value={form.period.toString()}
+                    onValueChange={(value) => handleProductChange(index, "period", parseFloat(value) as 0.5 | 1 | 2 | 3)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0.5">0.5 year</SelectItem>
+                      <SelectItem value="1">1 year</SelectItem>
+                      <SelectItem value="2">2 years</SelectItem>
+                      <SelectItem value="3">3 years</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              {/* Price */}
-              <div className="space-y-1">
-                <Label className="text-xs">Price</Label>
-                <Input
-                  type="number"
-                  value={form.price}
-                  onChange={(e) => handleProductChange(index, "price", e.target.value)}
-                  placeholder="0"
-                  min="0"
-                  step="0.01"
-                />
+                {/* Price - Bottom Right */}
+                <div className="space-y-1">
+                  <Label className="text-xs">Price</Label>
+                  <Input
+                    type="number"
+                    value={form.price}
+                    onChange={(e) => handleProductChange(index, "price", e.target.value)}
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
               </div>
             </div>
           ))}
