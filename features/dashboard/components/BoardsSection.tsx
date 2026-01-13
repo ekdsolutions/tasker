@@ -106,7 +106,11 @@ export function BoardsSection({
 
   const totalPending = displayBoards.reduce((sum: number, board: Board) => sum + (board.upcoming_value || 0), 0);
   const totalReceived = displayBoards.reduce((sum: number, board: Board) => sum + (board.received_value || 0), 0);
-  const totalAnnual = displayBoards.reduce((sum: number, board: Board) => sum + (board.annual || 0), 0);
+  // Calculate total cost from all products across all boards
+  const totalAnnual = displayBoards.reduce((sum: number, board: Board) => {
+    const boardCost = board.products?.reduce((productSum: number, product: any) => productSum + (product.cost || 0), 0) || 0;
+    return sum + boardCost;
+  }, 0);
   const boardsCount = displayBoards.length;
 
   return (

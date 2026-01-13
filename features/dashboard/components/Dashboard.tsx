@@ -32,7 +32,7 @@ export default function Dashboard() {
   const [newBoardTitle, setNewBoardTitle] = useState<string>("");
   const [newBoardStartedDate, setNewBoardStartedDate] = useState<string>("");
   const [newBoardLabelIds, setNewBoardLabelIds] = useState<string[]>([]);
-  const [newBoardProducts, setNewBoardProducts] = useState<Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number }>>([]);
+  const [newBoardProducts, setNewBoardProducts] = useState<Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number; cost: number }>>([]);
   const [newBoardTotalValue, setNewBoardTotalValue] = useState<string>("");
   const [newBoardPendingValue, setNewBoardPendingValue] = useState<string>("");
   const [newBoardReceivedValue, setNewBoardReceivedValue] = useState<string>("");
@@ -42,7 +42,7 @@ export default function Dashboard() {
   const [editingBoardTitle, setEditingBoardTitle] = useState<string>("");
   const [editingBoardStartedDate, setEditingBoardStartedDate] = useState<string>("");
   const [editingBoardLabelIds, setEditingBoardLabelIds] = useState<string[]>([]);
-  const [editingBoardProducts, setEditingBoardProducts] = useState<Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number }>>([]);
+  const [editingBoardProducts, setEditingBoardProducts] = useState<Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number; cost: number }>>([]);
   const [editingBoardTotalValue, setEditingBoardTotalValue] = useState<string>("");
   const [editingBoardPendingValue, setEditingBoardPendingValue] = useState<string>("");
   const [editingBoardReceivedValue, setEditingBoardReceivedValue] = useState<string>("");
@@ -200,6 +200,7 @@ export default function Dashboard() {
       started_date: p.started_date,
       period: p.period,
       price: p.price,
+      cost: p.cost || 0,
     })) || []);
     setEditingBoardTotalValue(board.total_value?.toString() || "");
     setEditingBoardPendingValue(board.upcoming_value?.toString() || "");

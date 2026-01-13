@@ -160,12 +160,12 @@ export function useBoards() {
     }
   }
 
-  async function updateBoardProducts(boardId: string, products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number }>) {
+  async function updateBoardProducts(boardId: string, products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number; cost: number }>) {
     if (!user || !supabase) return;
     try {
       await productService.updateBoardProducts(supabase, boardId, user.id, products);
       
-      // Calculate annual from products
+      // Calculate annual from products (price/period, not including cost)
       const calculatedAnnual = products.reduce((sum, product) => {
         return sum + (product.price / product.period);
       }, 0);
@@ -208,6 +208,7 @@ export function useBoards() {
         started_date: p.started_date,
         period: p.period,
         price: p.price,
+        cost: p.cost || 0,
         sort_order: idx,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),

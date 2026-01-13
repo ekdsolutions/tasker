@@ -19,12 +19,13 @@ interface ProductFormData {
   started_date: string;
   period: 0.5 | 1 | 2 | 3;
   price: string;
+  cost: string;
 }
 
 interface ProductsEditorProps {
   products: Product[];
   savedProducts: SavedProduct[];
-  onSave: (products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number }>) => void;
+  onSave: (products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number; cost: number }>) => void;
   onCancel: () => void;
   onCreateSavedProduct: (name: string) => Promise<SavedProduct>;
 }
@@ -43,6 +44,7 @@ export function ProductsEditor({
         started_date: p.started_date,
         period: p.period,
         price: p.price.toString(),
+        cost: (p.cost || 0).toString(),
       }));
     }
     return [{
@@ -50,6 +52,7 @@ export function ProductsEditor({
       started_date: "",
       period: 1 as 0.5 | 1 | 2 | 3,
       price: "",
+      cost: "",
     }];
   });
 
@@ -78,6 +81,7 @@ export function ProductsEditor({
       started_date: "",
       period: 1,
       price: "",
+      cost: "",
     }]);
   };
 
@@ -99,6 +103,7 @@ export function ProductsEditor({
         started_date: form.started_date,
         period: form.period,
         price: parseFloat(form.price) || 0,
+        cost: parseFloat(form.cost) || 0,
       }));
 
     onSave(validProducts);
@@ -228,23 +233,36 @@ export function ProductsEditor({
                   </div>
                 </div>
 
-                {/* Period - Full Width */}
-                <div className="space-y-1">
-                  <Label className="text-xs">Period</Label>
-                  <Select
-                    value={form.period.toString()}
-                    onValueChange={(value) => handleProductChange(index, "period", parseFloat(value) as 0.5 | 1 | 2 | 3)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0.5">0.5 year</SelectItem>
-                      <SelectItem value="1">1 year</SelectItem>
-                      <SelectItem value="2">2 years</SelectItem>
-                      <SelectItem value="3">3 years</SelectItem>
-                    </SelectContent>
-                  </Select>
+                {/* Period and Cost - Side by Side */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Period</Label>
+                    <Select
+                      value={form.period.toString()}
+                      onValueChange={(value) => handleProductChange(index, "period", parseFloat(value) as 0.5 | 1 | 2 | 3)}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0.5">0.5 year</SelectItem>
+                        <SelectItem value="1">1 year</SelectItem>
+                        <SelectItem value="2">2 years</SelectItem>
+                        <SelectItem value="3">3 years</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Cost</Label>
+                    <Input
+                      type="number"
+                      value={form.cost}
+                      onChange={(e) => handleProductChange(index, "cost", e.target.value)}
+                      placeholder="0"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
                 </div>
               </div>
             </div>

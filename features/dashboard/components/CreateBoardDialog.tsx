@@ -22,8 +22,8 @@ interface CreateBoardDialogProps {
   allLabels: LabelModel[];
   onCreateLabel: (text: string, color: string) => Promise<LabelModel>;
   savedProducts: SavedProduct[];
-  selectedProducts: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number }>;
-  onProductsChange: (products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number }>) => void;
+  selectedProducts: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number; cost: number }>;
+  onProductsChange: (products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number; cost: number }>) => void;
   onCreateSavedProduct: (name: string) => Promise<SavedProduct>;
   totalValue: string;
   onTotalValueChange: (value: string) => void;
@@ -146,6 +146,7 @@ export function CreateBoardDialog({
                   started_date: p.started_date,
                   period: p.period,
                   price: p.price,
+                  cost: p.cost || 0,
                   sort_order: idx,
                   created_at: new Date().toISOString(),
                   updated_at: new Date().toISOString(),

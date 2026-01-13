@@ -20,6 +20,7 @@ export interface Product {
   started_date: string;
   period: 0.5 | 1 | 2 | 3;
   price: number;
+  cost: number;
   sort_order: number;
   created_at: string;
   updated_at: string;

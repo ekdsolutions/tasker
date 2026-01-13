@@ -505,7 +505,7 @@ export const productService = {
     supabase: SupabaseClient,
     boardId: string,
     userId: string,
-    products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number }>
+    products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number; cost: number }>
   ): Promise<void> {
     // Delete existing products
     await supabase
@@ -529,6 +529,7 @@ export const productService = {
         started_date: product.started_date,
         period: product.period,
         price: product.price,
+        cost: product.cost || 0,
         sort_order: index,
       }));
 
