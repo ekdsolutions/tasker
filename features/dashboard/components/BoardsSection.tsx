@@ -29,7 +29,7 @@ interface BoardsSectionProps {
   onCreateLabel?: (text: string, color: string) => Promise<Label>;
   onDeleteLabel?: (labelId: string) => Promise<void>;
   savedProducts?: SavedProduct[];
-  onProductsUpdate?: (boardId: string, products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number }>) => Promise<void>;
+  onProductsUpdate?: (boardId: string, products: Array<{ name: string; started_date: string; period: 0.5 | 1 | 2 | 3; price: number; cost: number }>) => Promise<void>;
   onCreateSavedProduct?: (name: string) => Promise<SavedProduct>;
   onEditBoard?: (boardId: string) => void;
   onDeleteBoard?: (boardId: string) => void;
