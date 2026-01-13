@@ -106,6 +106,7 @@ export function BoardsSection({
 
   const totalPending = displayBoards.reduce((sum: number, board: Board) => sum + (board.upcoming_value || 0), 0);
   const totalReceived = displayBoards.reduce((sum: number, board: Board) => sum + (board.received_value || 0), 0);
+  const totalTotal = displayBoards.reduce((sum: number, board: Board) => sum + (board.total_value || 0), 0);
   // Calculate net annual (annual price - annual cost) from all products across all boards
   const totalAnnual = displayBoards.reduce((sum: number, board: Board) => {
     const boardNetAnnual = board.products?.reduce((productSum: number, product: any) => {
@@ -221,7 +222,7 @@ export function BoardsSection({
                     {formatCurrency(totalReceived)}
                   </td>
                   <td className="py-2 px-3 text-sm text-gray-700 hidden lg:table-cell">
-                    {/* Empty total cell */}
+                    {formatCurrency(totalTotal)}
                   </td>
                   <td className="py-2 px-3 text-sm text-gray-700 hidden lg:table-cell">
                     {formatCurrency(totalAnnual)}

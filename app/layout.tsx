@@ -18,10 +18,7 @@ export const metadata: Metadata = {
   title: "Tasker",
   description: "A modern project management tool for organizing your tasks and projects",
   icons: {
-    icon: [
-      { url: "/kesso-favicon.png", sizes: "any" },
-      { url: "/kesso-favicon.png", type: "image/png" },
-    ],
+    icon: "/kesso-favicon.png",
     shortcut: "/kesso-favicon.png",
     apple: "/kesso-favicon.png",
   },
