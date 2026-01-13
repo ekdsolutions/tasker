@@ -17,11 +17,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Tasker",
   description: "A modern project management tool for organizing your tasks and projects",
-  icons: {
-    icon: "/kesso-favicon.png",
-    shortcut: "/kesso-favicon.png",
-    apple: "/kesso-favicon.png",
-  },
 };
 
 export default function RootLayout({
