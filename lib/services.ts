@@ -37,6 +37,7 @@ export const boardService = {
           started_date,
           period,
           price,
+          cost,
           sort_order,
           created_at,
           updated_at

@@ -104,9 +104,16 @@ export function BoardsSection({
     }).format(value);
   };
 
+  // Calculate summary totals
+  // Pending: sum of all upcoming_value fields
   const totalPending = displayBoards.reduce((sum: number, board: Board) => sum + (board.upcoming_value || 0), 0);
+  // Received: sum of all received_value fields
   const totalReceived = displayBoards.reduce((sum: number, board: Board) => sum + (board.received_value || 0), 0);
-  const totalTotal = displayBoards.reduce((sum: number, board: Board) => sum + (board.total_value || 0), 0);
+  // Total: sum of all total_value fields (simple sum)
+  const totalTotal = displayBoards.reduce((sum: number, board: Board) => {
+    const boardTotal = board.total_value ?? 0;
+    return sum + boardTotal;
+  }, 0);
   // Calculate net annual (annual price - annual cost) from all products across all boards
   const totalAnnual = displayBoards.reduce((sum: number, board: Board) => {
     const boardNetAnnual = board.products?.reduce((productSum: number, product: any) => {
