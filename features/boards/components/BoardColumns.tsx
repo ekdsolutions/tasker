@@ -16,6 +16,7 @@ interface BoardColumnsProps {
   columns: ColumnWithTasks[];
   loading: boolean;
   onCreateTask: (task: any) => Promise<void>;
+  onEditTask?: (task: any) => void;
   onEditColumn: (column: ColumnWithTasks) => void;
   onDeleteColumn: (columnId: string) => void;
   onDeleteTask: (taskId: string) => void;
@@ -28,6 +29,7 @@ export function BoardColumns({
   columns,
   loading,
   onCreateTask,
+  onEditTask,
   onEditColumn,
   onDeleteColumn,
   onDeleteTask,
@@ -55,6 +57,8 @@ export function BoardColumns({
           <TaskTableView 
             columns={columns} 
             onDeleteTask={onDeleteTask}
+            onDeleteColumn={onDeleteColumn}
+            onEditTask={onEditTask}
             moveTask={moveTask}
           />
         </SortableContext>

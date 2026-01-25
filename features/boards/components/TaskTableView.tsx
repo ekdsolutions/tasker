@@ -1,26 +1,30 @@
 "use client";
 
 import { ColumnWithTasks, Task } from "@/lib/supabase/models";
-import { Calendar, Trash2, User, GripVertical } from "lucide-react";
+import { Calendar, Trash2, User, GripVertical, ChevronDown, ChevronRight, X } from "lucide-react";
 import { getPriorityColor } from "../utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useDroppable } from "@dnd-kit/core";
+import { useState } from "react";
 
 interface TaskTableViewProps {
   columns: ColumnWithTasks[];
   onDeleteTask: (taskId: string) => void;
+  onDeleteColumn?: (columnId: string) => void;
+  onEditTask?: (task: Task) => void;
   moveTask?: (taskId: string, columnId: string, newIndex: number) => Promise<void>;
 }
 
 interface SortableTaskRowProps {
   task: Task & { columnTitle: string; columnId: string };
   onDeleteTask: (taskId: string) => void;
+  onEditTask?: (task: Task) => void;
 }
 
-function SortableTaskRow({ task, onDeleteTask }: SortableTaskRowProps) {
+function SortableTaskRow({ task, onDeleteTask, onEditTask }: SortableTaskRowProps) {
   const {
     attributes,
     listeners,
@@ -52,7 +56,12 @@ function SortableTaskRow({ task, onDeleteTask }: SortableTaskRowProps) {
         </div>
       </td>
       <td className="py-4 px-4">
-        <div className="font-medium text-gray-900">{task.title}</div>
+        <div
+          className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+          onClick={() => onEditTask && onEditTask(task)}
+        >
+          {task.title}
+        </div>
         <div className="text-xs text-gray-500 sm:hidden mt-1">
           {task.description ? (
             <span className="line-clamp-1">{task.description}</span>
@@ -130,7 +139,10 @@ function DroppableColumnSection({ column, children }: DroppableColumnSectionProp
   );
 }
 
-export function TaskTableView({ columns, onDeleteTask, moveTask }: TaskTableViewProps) {
+export function TaskTableView({ columns, onDeleteTask, onDeleteColumn, onEditTask, moveTask }: TaskTableViewProps) {
+  // State to track collapsed columns
+  const [collapsedColumns, setCollapsedColumns] = useState<Set<string>>(new Set());
+
   // Flatten all tasks from all columns with their column info
   const allTasks = columns.flatMap((column) =>
     column.tasks.map((task) => ({
@@ -153,48 +165,93 @@ export function TaskTableView({ columns, onDeleteTask, moveTask }: TaskTableView
     return colors[index % colors.length];
   };
 
+  const toggleCollapse = (columnId: string) => {
+    setCollapsedColumns((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(columnId)) {
+        newSet.delete(columnId);
+      } else {
+        newSet.add(columnId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleDeleteColumn = (columnId: string) => {
+    if (onDeleteColumn) {
+      onDeleteColumn(columnId);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {columns.map((column, columnIndex) => (
-        <div key={column.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <DroppableColumnSection column={column}>
-            {/* Column Header */}
-            <div className={`px-4 py-3 border-b ${getColumnColor(columnIndex)}`}>
-              <h3 className="font-semibold text-sm uppercase tracking-wide">
-                {column.title}
-              </h3>
-            </div>
-            
-            {/* Tasks Table */}
-            {column.tasks.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b border-gray-200 bg-gray-50">
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 w-12">
-                        {/* Drag handle column */}
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                        Task
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 hidden sm:table-cell">
-                        Description
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 hidden md:table-cell">
-                        Assignee
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 hidden lg:table-cell">
-                        Due Date
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                        Priority
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
+      {columns.map((column, columnIndex) => {
+        const isCollapsed = collapsedColumns.has(column.id);
+        
+        return (
+          <div key={column.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <DroppableColumnSection column={column}>
+              {/* Column Header */}
+              <div className={`px-4 py-3 border-b ${getColumnColor(columnIndex)} flex items-center justify-between`}>
+                <div className="flex items-center gap-2 flex-1">
+                  <button
+                    onClick={() => toggleCollapse(column.id)}
+                    className="p-1 hover:bg-black/10 rounded transition-colors"
+                    aria-label={isCollapsed ? "Expand list" : "Collapse list"}
+                  >
+                    {isCollapsed ? (
+                      <ChevronRight className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </button>
+                  <h3 className="font-semibold text-sm uppercase tracking-wide">
+                    {column.title}
+                  </h3>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleDeleteColumn(column.id)}
+                    className="p-1 hover:bg-black/10 rounded transition-colors text-gray-600 hover:text-red-600"
+                    aria-label="Delete list"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              
+              {/* Tasks Table */}
+              {!isCollapsed && (
+                <>
+                  {column.tasks.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b border-gray-200 bg-gray-50">
+                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 w-12">
+                              {/* Drag handle column */}
+                            </th>
+                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
+                              Task
+                            </th>
+                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 hidden sm:table-cell">
+                              Description
+                            </th>
+                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 hidden md:table-cell">
+                              Assignee
+                            </th>
+                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 hidden lg:table-cell">
+                              Due Date
+                            </th>
+                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
+                              Priority
+                            </th>
+                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
                     {column.tasks.map((task) => (
                       <SortableTaskRow
                         key={task.id}
@@ -204,22 +261,26 @@ export function TaskTableView({ columns, onDeleteTask, moveTask }: TaskTableView
                           columnId: column.id,
                         }}
                         onDeleteTask={onDeleteTask}
+                        onEditTask={onEditTask}
                       />
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="px-4 py-8 text-center text-gray-400 text-sm">
-                <div className="font-medium text-gray-600 mb-1">
-                  {column.title}
-                </div>
-                <div>No tasks in this list</div>
-              </div>
-            )}
-          </DroppableColumnSection>
-        </div>
-      ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="px-4 py-8 text-center text-gray-400 text-sm">
+                      <div className="font-medium text-gray-600 mb-1">
+                        {column.title}
+                      </div>
+                      <div>No tasks in this list</div>
+                    </div>
+                  )}
+                </>
+              )}
+            </DroppableColumnSection>
+          </div>
+        );
+      })}
       
       {allTasks.length === 0 && (
         <div className="bg-white rounded-lg shadow-sm p-12 text-center text-gray-500">

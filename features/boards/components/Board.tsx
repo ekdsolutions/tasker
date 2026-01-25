@@ -37,6 +37,7 @@ export default function Board() {
     error,
     updateBoard,
     createRealTask,
+    updateRealTask,
     moveTask,
     createColumn,
     updateColumn,
@@ -61,6 +62,8 @@ export default function Board() {
   const [isDeletingColumn, setIsDeletingColumn] = useState(false);
   const [deletingColumnId, setDeletingColumnId] = useState<string | null>(null);
   const [isCreatingTask, setIsCreatingTask] = useState(false);
+  const [isEditingTask, setIsEditingTask] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [viewMode, setViewMode] = useState<"cards" | "table">(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("boardViewMode");
@@ -147,6 +150,41 @@ export default function Board() {
     if (taskData.title.trim()) {
       await createTask(taskData, columnId);
       setIsCreatingTask(false);
+    }
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setIsEditingTask(true);
+  };
+
+  const handleUpdateTask = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingTask) return;
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const updates = {
+      title: formData.get("title") as string,
+      description: formData.get("description") as string | undefined,
+      assignee: formData.get("assignee") as string | undefined,
+      priority: formData.get("priority") as "low" | "medium" | "high",
+      dueDate: formData.get("dueDate") as string | undefined,
+    };
+
+    if (updates.title.trim()) {
+      try {
+        await updateRealTask(editingTask.id, {
+          title: updates.title,
+          description: updates.description || null,
+          assignee: updates.assignee || null,
+          priority: updates.priority,
+          dueDate: updates.dueDate || null,
+        });
+        setIsEditingTask(false);
+        setEditingTask(null);
+      } catch (err) {
+        console.error("Error updating task:", err);
+      }
     }
   };
 
@@ -359,6 +397,7 @@ export default function Board() {
               columns={filteredColumns}
               loading={loading}
               onCreateTask={handleCreateTask}
+              onEditTask={handleEditTask}
               onEditColumn={handleEditColumn}
               onDeleteColumn={requestDeleteColumn}
               onDeleteTask={requestDeleteTask}
@@ -395,6 +434,16 @@ export default function Board() {
         isOpen={isCreatingTask}
         onOpenChange={setIsCreatingTask}
         onSubmit={handleCreateTask}
+      />
+
+      <EditTaskDialog
+        isOpen={isEditingTask}
+        onOpenChange={(open) => {
+          setIsEditingTask(open);
+          if (!open) setEditingTask(null);
+        }}
+        onSubmit={handleUpdateTask}
+        task={editingTask}
       />
 
       <CreateColumnDialog

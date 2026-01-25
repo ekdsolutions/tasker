@@ -176,6 +176,41 @@ export function useBoard(boardId: string) {
     }
   }
 
+  async function updateRealTask(
+    taskId: string,
+    updates: {
+      title?: string;
+      description?: string | null;
+      assignee?: string | null;
+      priority?: "low" | "medium" | "high";
+      dueDate?: string | null;
+    }
+  ) {
+    const prevColumns = structuredClone(columns);
+    try {
+      const updatedTask = await taskService.updateTask(supabase!, taskId, {
+        title: updates.title,
+        description: updates.description,
+        assignee: updates.assignee,
+        priority: updates.priority,
+        due_date: updates.dueDate,
+      });
+
+      setColumns((prev) =>
+        prev.map((col) => ({
+          ...col,
+          tasks: col.tasks.map((t) => (t.id === taskId ? updatedTask : t)),
+        }))
+      );
+
+      return updatedTask;
+    } catch (err) {
+      console.error("Failed to update task:", err);
+      setColumns(prevColumns);
+      throw err;
+    }
+  }
+
   async function deleteRealTask(taskId: string) {
     const prevColumns = structuredClone(columns);
     try {
@@ -211,6 +246,7 @@ export function useBoard(boardId: string) {
     error,
     updateBoard,
     createRealTask,
+    updateRealTask,
     moveTask,
     createColumn,
     updateColumn,
